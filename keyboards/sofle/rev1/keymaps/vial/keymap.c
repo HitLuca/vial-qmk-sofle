@@ -24,11 +24,17 @@
 #include <quantum.h>
 
 #ifdef OLED_ENABLE
-    // #include "oled/oled.c"
-    // #include "oled/luna.c"
+	#if defined(OLED_EFFECT_SOUNDMONSTER)
     #include "oled/soundmonster.c"
-    // #include "oled/bongocat.c"
-    // #include "oled/snakey.c"
+	#elif defined(OLED_EFFECT_LUNA)
+    #include "oled/luna.c"
+    #elif defined(OLED_EFFECT_BONGOCAT)
+    #include "oled/bongocat.c"
+    #elif defined(OLED_EFFECT_SNAKEY)
+    #include "oled/snakey.c"
+	#elif defined(OLED_EFFECT_OLED)
+    #include "oled/oled.c"
+    #endif
 #endif
 
 enum sofle_layers {

@@ -1,4 +1,7 @@
 #ifdef OLED_ENABLE
+
+int current_wpm_read = 0;
+
 oled_rotation_t oled_init_user(oled_rotation_t rotation) {
     return OLED_ROTATION_270;
 }
@@ -142,7 +145,7 @@ void render_mod_status_ctrl_shift(uint8_t modifiers) {
 void render_logo(void) {
     static const char PROGMEM corne_logo[] = {0x80, 0x81, 0x82, 0x83, 0x84, 0xa0, 0xa1, 0xa2, 0xa3, 0xa4, 0xc0, 0xc1, 0xc2, 0xc3, 0xc4, 0};
     oled_write_P(corne_logo, false);
-    oled_write_P(PSTR("corne"), false);
+    oled_write_P(PSTR("Sofle"), false);
 }
 
 void render_layer_state(void) {
@@ -166,7 +169,7 @@ void render_layer_state(void) {
     }
 }
 
-bool oled_task_user(void) {
+void print_status_narrow(void) {
     // Renders the current keyboard state (layers and mods)
     render_logo();
     render_space();
@@ -174,7 +177,30 @@ bool oled_task_user(void) {
     render_space();
     render_mod_status_gui_alt(get_mods() | get_oneshot_mods());
     render_mod_status_ctrl_shift(get_mods() | get_oneshot_mods());
-    return false;
 }
 
+static void print_logo_narrow(void) {
+    oled_set_cursor(0, 3);
+    oled_write("SOLAR", false);
+    oled_set_cursor(0, 4);
+    oled_write("TMPST", false);
+
+    /* wpm counter */
+    char wpm_str[8];
+    oled_set_cursor(0, 10);
+    sprintf(wpm_str, " %03d", current_wpm_read);
+    oled_write(wpm_str, false);
+    oled_set_cursor(0, 11);
+    oled_write(" wpm", false);
+}
+
+bool oled_task_user(void) {
+    current_wpm_read = get_current_wpm();
+    if (is_keyboard_master()) {
+        print_status_narrow();
+    } else {
+        print_logo_narrow();
+    }
+    return false;
+}
 #endif
